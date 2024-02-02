@@ -5,13 +5,13 @@ class Kripke:
         pass
 
     def add_node(self, node):
-        pass
+        self.nodes.append(node)
 
     def add_relation(self, node1, node2):
-        self.relations[node1] = node2
+        self.relations[node1.node_id] = node2.node_id
 
     def are_related(self, node1, node2):
-        return node1 in self.nodes and node1 in self.relations and self.relations[node1] == node2
+        return node1 in self.nodes and node1 in self.relations and self.relations[node1.node_id] == node2.node_id
 
     def get_initial_state(self):
         for n in self.nodes:
