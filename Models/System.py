@@ -13,4 +13,4 @@ class System:
         self.robots.append(robot)
 
     def clear(self):
-        self.robot.clear()
+        self.robots.clear()
