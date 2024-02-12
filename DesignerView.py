@@ -205,7 +205,7 @@ class DesignerView(QWidget):
 
     def finish_design(self):
         kg = KripkeGenerator()
-        kg.generate_from_system(self.designed_system, self.grid_size)
+        generate_from_system(self.designed_system, self.grid_size)
 
     def set_robot(self):
         if not self.current_robot.is_valid():
