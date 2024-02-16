@@ -1,3 +1,5 @@
+from math import sqrt
+import random as rand
 from z3 import *
 
 from Models.Kripke import Kripke
@@ -108,3 +110,105 @@ def create_M1(n):
             M1.add_relation_by_id((row * n) + col, (row * n) + col)
 
     return M1
+
+
+def auto_generate_system(n, num_counter_agents, stay_chance, stray_radius):
+    generated_system = System()
+
+    for rnum in range(num_counter_agents):
+        generated_system.add_robot(auto_gen_robot(n, stay_chance, stray_radius))
+
+    return generated_system, generate_from_system(generated_system,n)
+
+
+def auto_gen_robot(n, stay_chance, stray_radius):
+    robot = Robot()
+    initial_pos = (random_number(0, n - 1), random_number(0, n - 1))
+    print(f"initial: {initial_pos}")
+    can_initially_stay = has_happend(stay_chance)
+    minimal_stray_radius = 0
+    if can_initially_stay:
+        minimal_stray_radius = 0
+    else:
+        minimal_stray_radius = 1
+
+    travel_distance = random_number(minimal_stray_radius, stray_radius)
+    robot.initial_pos = initial_pos
+    can_move_up = has_happend(0.5) and ((initial_pos[0] - 1) >= 0) and (travel_distance > 0)
+    can_move_down = has_happend(0.5) and ((initial_pos[0] + 1) < n) and (travel_distance > 0)
+    can_move_right = has_happend(0.5) and ((initial_pos[1] + 1) < n) and (travel_distance > 0)
+    can_move_left = has_happend(0.5) and ((initial_pos[1] - 1) >= 0) and (travel_distance > 0)
+    robot.add_movement(initial_pos[0], initial_pos[1], can_move_right, can_move_left, can_move_up, can_move_down,
+                       can_initially_stay, True)
+    current_pos = initial_pos
+    cur_distance = (travel_distance, travel_distance)
+
+    if (not can_move_up) and (not can_move_down) and (not can_move_left) and (not can_move_right):
+        can_initially_stay = True
+
+    robot.add_movement(initial_pos[0], initial_pos[1], can_move_right, can_move_left, can_move_up, can_move_down,
+                       can_initially_stay, True)
+
+    if can_move_right:
+        step((current_pos[0], current_pos[1] + 1), n, robot, initial_pos, stay_chance,
+             travel_distance)
+
+    if can_move_left:
+        step((current_pos[0], current_pos[1] - 1), n, robot, initial_pos, stay_chance,
+             travel_distance)
+
+    if can_move_up:
+        step((current_pos[0] - 1, current_pos[1]), n, robot, initial_pos, stay_chance,
+             travel_distance)
+
+    if can_move_down:
+        step((current_pos[0] + 1, current_pos[1]), n, robot, initial_pos, stay_chance,
+             travel_distance)
+
+    return robot
+
+def has_happend(chance):
+    return rand.random() < chance
+
+
+def random_number(min, max):
+    return rand.randint(min, max)
+
+
+def distance(r, c, ri, ci):
+    return (ri - r), (ci - c)
+
+
+def step(current_pos, n, robot, initial_pos, stay_chance, travel_distance):
+    print(current_pos)
+    if robot.movement_get(current_pos[0], current_pos[1]) is not None:
+        return
+
+    cur_distance = distance(current_pos[0], current_pos[1], initial_pos[0], initial_pos[1])
+    can_move_up = has_happend(0.5) and ((current_pos[0] - 1) >= 0) and (abs(cur_distance[0]) < travel_distance)
+    can_move_down = has_happend(0.5) and ((current_pos[0] + 1) < n) and (abs(cur_distance[0]) < travel_distance)
+    can_move_right = has_happend(0.5) and ((current_pos[1] + 1) < n) and (abs(cur_distance[1]) < travel_distance)
+    can_move_left = has_happend(0.5) and ((current_pos[1] - 1) >= 0) and (abs(cur_distance[1]) < travel_distance)
+    can_stay = has_happend(stay_chance)
+
+    if (not can_move_up) and (not can_move_down) and (not can_move_left) and (not can_move_right):
+        can_stay = True
+
+    robot.add_movement(current_pos[0], current_pos[1], can_move_right, can_move_left, can_move_up, can_move_down,
+                       can_stay, False)
+
+    if can_move_right:
+        step((current_pos[0], current_pos[1] + 1), n, robot, initial_pos, stay_chance,
+             travel_distance)
+
+    if can_move_left:
+        step((current_pos[0], current_pos[1] - 1), n, robot, initial_pos, stay_chance,
+             travel_distance)
+
+    if can_move_up:
+        step((current_pos[0] - 1, current_pos[1]), n, robot, initial_pos, stay_chance,
+             travel_distance)
+
+    if can_move_down:
+        step((current_pos[0] + 1, current_pos[1]), n, robot, initial_pos, stay_chance,
+             travel_distance)

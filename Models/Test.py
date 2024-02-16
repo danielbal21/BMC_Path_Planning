@@ -3,9 +3,12 @@ from z3 import Bool, Solver, solve, sat, Not, is_true
 from Models.Robot import Robot
 from Models.System import System
 from Services.Formulizer import create_base, formulise
-from Services.KripkeGenerator import generate_from_system, create_M1
+from Services.KripkeGenerator import generate_from_system, create_M1, auto_generate_system
+import Services.FileManager
 
 n = 10
+sys, m2_1 = auto_generate_system(5, 1, 0.7, 1)
+exit(0)
 sys = System()
 r1 = Robot()
 r1.initial_pos = (4, 4)
@@ -45,8 +48,6 @@ sys.add_robot(r2)
 # Generate M1 and M2
 M2 = generate_from_system(sys, n)
 M1 = create_M1(n)
-
-base = create_base(3, 2)
 
 solver = Solver()
 solver.add(formulise(M2, n, k))
