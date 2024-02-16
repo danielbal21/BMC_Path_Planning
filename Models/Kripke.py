@@ -4,7 +4,11 @@ class Kripke:
         self.relations = {}
         self.count = 0
         pass
+    def __getstate__(self):
+        return self.__dict__
 
+    def __setstate__(self, state):
+        self.__dict__.update(state)
     def add_node(self, node):
         self.nodes.append(node)
         self.count += 1
