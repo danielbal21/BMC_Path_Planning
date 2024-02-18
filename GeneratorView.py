@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout,
 from PyQt5.QtCore import QCoreApplication
 
 from Services.KripkeGenerator import auto_generate_system
+from SystemView import SystemView
 
 
 class GeneratorView(QWidget):
@@ -80,10 +81,10 @@ class GeneratorView(QWidget):
 
         try:
             num_counteragents = int(num_counteragents)
-            max_steps = int(stray_radius)
+            stray_radius = int(stray_radius)
             grid_size = int(grid_size)
             stay_chance = float(stay_chance)
-            if num_counteragents < 0 or max_steps < 0 or grid_size < 2 or (0.0 > stay_chance) or (stay_chance > 1.0):
+            if num_counteragents < 0 or stray_radius < 0 or grid_size < 2 or (0.0 > stay_chance) or (stay_chance > 1.0):
                 raise ValueError()
         except ValueError:
             QMessageBox.warning(self, "Invalid Input", "Please enter valid numeric values.")
@@ -91,3 +92,6 @@ class GeneratorView(QWidget):
 
         M2 = auto_generate_system(grid_size, num_counteragents, stay_chance, stray_radius)
         QMessageBox.information(self, "System Generated", "System has been generated successfully.")
+
+        systemViewer = SystemView(M2[1])
+        self.parent.window.setCentralWidget(systemViewer)

@@ -142,7 +142,7 @@ class DesignerView(QWidget):
         # You can access the checkbox states using self.step_up_checkbox.isChecked(), etc.
         self.initial_cell = self.selected_cell
         if self.initial_cell is not None:
-            self.current_robot.initial_pos = (self.initial_cell[1],self.initial_cell[0])
+            self.current_robot.initial_pos = (self.initial_cell[1], self.initial_cell[0])
         else:
             self.current_robot.initial_pos = None
         self.updateGridColor()
@@ -208,7 +208,7 @@ class DesignerView(QWidget):
 
     def set_robot(self):
         if not self.current_robot.is_valid():
-            QMessageBox.critical(self,'Invalid Robot','This robot has invalid movements', QMessageBox.Ok)
+            QMessageBox.critical(self, 'Invalid Robot', 'This robot has invalid movements', QMessageBox.Ok)
         else:
             self.designed_system.add_robot(self.current_robot)
 
@@ -220,7 +220,6 @@ class DesignerView(QWidget):
             self.selected_cell = None
             self.initial_cell = self.selected_cell
             self.updateGridColor()
-
 
     def selected_cell_changed(self):
         if self.selected_cell is None:

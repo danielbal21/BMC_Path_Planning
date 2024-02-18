@@ -6,6 +6,7 @@ from Services.Formulizer import create_base, formulise
 from Services.KripkeGenerator import generate_from_system, create_M1, auto_generate_system
 import Services.FileManager
 
+exit(0)
 n = 10
 sys, m2_1 = auto_generate_system(5, 1, 0.7, 1)
 exit(0)
