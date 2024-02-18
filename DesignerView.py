@@ -9,10 +9,11 @@ from PyQt5.QtWidgets import (
     QLabel, QLineEdit, QScrollBar, QScrollArea, QCheckBox, QPushButton, QMessageBox
 )
 from PyQt5.QtGui import QPainter, QColor, QBrush
-from PyQt5.QtCore import Qt, QRectF
+from PyQt5.QtCore import Qt, QRectF, QPoint
 
 from Services import KripkeGenerator
 from SystemView import SystemView
+from Utils.Visual import ArrowWidget
 
 
 class DesignerView(QWidget):
@@ -203,6 +204,7 @@ class DesignerView(QWidget):
               f"\nD:{self.step_down_checkbox.isChecked()}"
               f"\nS:{self.step_stay_checkbox.isChecked()}"
               f"\nI:{self.initial_cell == self.selected_cell}")
+        self.updateGridColor()
 
     def finish_design(self):
         M2 = KripkeGenerator.generate_from_system(self.designed_system, self.grid_size)
@@ -268,11 +270,12 @@ class GridWidget(QWidget):
         cell_height = (self.height() * self.zoom_factor) / self.grid_size
 
         # Calculate the center offset
-        center_offset_x = (self.parent.center_x)
-        center_offset_y = (self.parent.center_y)
+        center_offset_x = self.parent.center_x
+        center_offset_y = self.parent.center_y
 
         for x in range(self.grid_size):
             for y in range(self.grid_size):
+                cur_movement = self.parent.current_robot.movement_get(y, x)
                 cell_x = x * cell_width + center_offset_x
                 cell_y = y * cell_height + center_offset_y
                 cell_rect = QRectF(cell_x, cell_y, cell_width - 1, cell_height - 1)
@@ -282,10 +285,42 @@ class GridWidget(QWidget):
                     painter.fillRect(cell_rect, QBrush(QColor(0, 215, 100)))
                 elif (x, y) == self.parent.selected_cell:
                     painter.fillRect(cell_rect, QBrush(QColor(0, 120, 215)))
-                elif self.parent.current_robot.movement_get(y, x) is not None:
+                elif cur_movement is not None:
                     painter.fillRect(cell_rect, QBrush(QColor(60, 90, 160)))
                 else:
                     painter.drawRect(cell_rect)
+
+                if cur_movement is not None:
+                    if cur_movement.right:
+                        self.draw_right_arrow(painter, cell_x, cell_width, cell_y, cell_height)
+                    if cur_movement.left:
+                        self.draw_left_arrow(painter, cell_x, cell_width, cell_y, cell_height)
+                    if cur_movement.up:
+                        self.draw_up_arrow(painter, cell_x, cell_width, cell_y, cell_height)
+                    if cur_movement.down:
+                        self.draw_down_arrow(painter, cell_x, cell_width, cell_y, cell_height)
+                    if cur_movement.stay:
+                        pass
+
+    def draw_right_arrow(self, painter, cell_x, cell_width, cell_y, cell_height):
+        aw = ArrowWidget()
+        aw.draw_arrow(painter, QPoint(int(cell_x + cell_width / 2), int(cell_y + (cell_height / 2))),
+                      QPoint(int(cell_x + cell_width) - 2, int(cell_y + (cell_height / 2))))
+
+    def draw_left_arrow(self, painter, cell_x, cell_width, cell_y, cell_height):
+        aw = ArrowWidget()
+        aw.draw_arrow(painter, QPoint(int(cell_x + cell_width / 2), int(cell_y + (cell_height / 2))),
+                      QPoint(int(cell_x) + 2, int(cell_y + (cell_height / 2))))
+
+    def draw_down_arrow(self, painter, cell_x, cell_width, cell_y, cell_height):
+        aw = ArrowWidget()
+        aw.draw_arrow(painter, QPoint(int(cell_x + cell_width / 2), int(cell_y + (cell_height / 2))),
+                      QPoint(int(cell_x + cell_width / 2), int(cell_y + cell_height) - 2))
+
+    def draw_up_arrow(self, painter, cell_x, cell_width, cell_y, cell_height):
+        aw = ArrowWidget()
+        aw.draw_arrow(painter, QPoint(int(cell_x + cell_width / 2), int(cell_y + (cell_height / 2))),
+                      QPoint(int(cell_x + cell_width / 2), int(cell_y) + 2))
 
     def mousePressEvent(self, event):
         # Get the mouse click coordinates
@@ -293,8 +328,8 @@ class GridWidget(QWidget):
             click_x = (event.x() - self.parent.center_x)
             click_y = (event.y() - self.parent.center_y)
             # Calculate the zoomed cell width and height
-            cell_width = (self.width() * self.zoom_factor) / (self.grid_size)
-            cell_height = (self.height() * self.zoom_factor) / (self.grid_size)
+            cell_width = (self.width() * self.zoom_factor) / self.grid_size
+            cell_height = (self.height() * self.zoom_factor) / self.grid_size
 
             # Calculate the cell coordinates based on the click coordinates
             cell_x = int(click_x / cell_width)
