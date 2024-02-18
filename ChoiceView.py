@@ -5,6 +5,7 @@ from PyQt5.QtCore import QCoreApplication
 from GeneratorView import GeneratorView
 from DesignerView import DesignerView
 from Services.FileManager import system_from_file
+from SystemView import SystemView
 
 
 class ChoiceView(QWidget):
@@ -56,6 +57,8 @@ class ChoiceView(QWidget):
         if file_path:
             print(f"Selected file: {file_path}")
             M2 = system_from_file(file_path)
+            sysView = SystemView(M2, self)
+            self.window.setCentralWidget(sysView)
 
     def generateSystem(self):
         generateView = GeneratorView(self)

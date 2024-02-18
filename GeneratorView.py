@@ -93,5 +93,5 @@ class GeneratorView(QWidget):
         M2 = auto_generate_system(grid_size, num_counteragents, stay_chance, stray_radius)
         QMessageBox.information(self, "System Generated", "System has been generated successfully.")
 
-        systemViewer = SystemView(M2[1])
+        systemViewer = SystemView(M2[1], self.parent)
         self.parent.window.setCentralWidget(systemViewer)

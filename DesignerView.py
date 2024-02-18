@@ -12,6 +12,7 @@ from PyQt5.QtGui import QPainter, QColor, QBrush
 from PyQt5.QtCore import Qt, QRectF
 
 from Services import KripkeGenerator
+from SystemView import SystemView
 
 
 class DesignerView(QWidget):
@@ -204,7 +205,9 @@ class DesignerView(QWidget):
               f"\nI:{self.initial_cell == self.selected_cell}")
 
     def finish_design(self):
-        KripkeGenerator.generate_from_system(self.designed_system, self.grid_size)
+        M2 = KripkeGenerator.generate_from_system(self.designed_system, self.grid_size)
+        sysView = SystemView(M2, self.parent)
+        self.parent.window.setCentralWidget(sysView)
 
     def set_robot(self):
         if not self.current_robot.is_valid():

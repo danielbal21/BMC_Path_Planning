@@ -1,18 +1,84 @@
 import networkx as nx
 import scipy as sp
 import matplotlib.pyplot as plt
-from PyQt5.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem
+from PyQt5 import Qt
+from PyQt5.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QVBoxLayout, QLabel, \
+    QLineEdit, QPushButton, QHBoxLayout, QFileDialog, QWidget
 from PyQt5.QtGui import QPixmap, QImage
 
+from Services.FileManager import system_to_file
 
-class SystemView(QGraphicsView):
-    def __init__(self, kripke):
+
+class SystemView(QWidget):
+    def __init__(self, kripke, parent):
         super().__init__()
 
+        self.parent = parent
         self.kripke = kripke
-        self.scene = QGraphicsScene(self)
-        self.setScene(self.scene)
-        self.kripke_present()
+        self.initUI()
+
+    def initUI(self):
+        layout = QVBoxLayout(self)
+
+        # Header Label
+        header_label = QLabel("System Viewer", self)
+        header_label.setAlignment(Qt.Qt.AlignCenter)
+        header_label.setStyleSheet("font-size: 24px; font-weight: bold; margin-bottom: 20px;")
+        layout.addWidget(header_label)
+
+        sub_layout = QHBoxLayout(self)
+
+        # View Button
+        view_system_btn = QPushButton("View M2", self)
+        view_system_btn.setStyleSheet("""
+            background-color: #2ecc71;
+            border: none;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+        """)
+        view_system_btn.clicked.connect(self.kripke_present)
+        sub_layout.addWidget(view_system_btn)
+
+        # Save Button
+        save_system_btn = QPushButton("Save System", self)
+        save_system_btn.setStyleSheet("""
+            background-color: #2ecc71;
+            border: none;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+        """)
+        save_system_btn.clicked.connect(self.save_file_dialog)
+        sub_layout.addWidget(save_system_btn)
+
+        # Solve Button
+        solve_system_btn = QPushButton("Solve", self)
+        solve_system_btn.setStyleSheet("""
+            background-color: #2ecc71;
+            border: none;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+        """)
+        solve_system_btn.clicked.connect(self.solve)
+        sub_layout.addWidget(solve_system_btn)
+
+        layout.addLayout(sub_layout)
+
+    def solve(self):
+        pass
+
+    def save_file_dialog(self):
+        # Display the file dialog for saving
+        file_dialog = QFileDialog()
+        file_dialog.setAcceptMode(QFileDialog.AcceptSave)
+        file_dialog.setNameFilter("Sys files (*.sys)")
+        file_dialog.setDefaultSuffix("sys")
+
+        if file_dialog.exec_() == QFileDialog.Accepted:
+            file_path = file_dialog.selectedFiles()[0]
+            system_to_file(file_path, self.kripke)
 
     def kripke_present(self):
 
@@ -50,7 +116,7 @@ class SystemView(QGraphicsView):
         return result
 
     def on_click(self, event):
-        tol = 0.05
+        tol = 0.1
         if event.inaxes == self.ax:
             for node in self.pos:
                 x, y = self.pos[node]
@@ -68,7 +134,7 @@ class SystemView(QGraphicsView):
 
         # Display the additional information in the upper right corner
         self.text_artist = self.ax.text(self.pos[node_id][0], self.pos[node_id][1], matrix_string,
-                                         fontsize=10,
+                                        fontsize=10,
                                         verticalalignment='top', horizontalalignment='right',
                                         bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
 
