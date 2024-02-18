@@ -1,10 +1,8 @@
-import networkx as nx
-import scipy as sp
 import matplotlib.pyplot as plt
+import networkx as nx
 from PyQt5 import Qt
-from PyQt5.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QVBoxLayout, QLabel, \
-    QLineEdit, QPushButton, QHBoxLayout, QFileDialog, QWidget
-from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtWidgets import QVBoxLayout, QLabel, \
+    QPushButton, QHBoxLayout, QFileDialog, QWidget
 
 from Services.FileManager import system_to_file
 
@@ -13,6 +11,10 @@ class SystemView(QWidget):
     def __init__(self, kripke, parent):
         super().__init__()
 
+        self.text_artist = None
+        self.pos = None
+        self.ax = None
+        self.fig = None
         self.parent = parent
         self.kripke = kripke
         self.initUI()
@@ -82,6 +84,7 @@ class SystemView(QWidget):
 
     def kripke_present(self):
 
+        plt.close()
         self.fig, self.ax = plt.subplots()
         self.fig.suptitle('Kripke Viewer')
         self.ax.set_title('Click a Node to view the safety matrix')
