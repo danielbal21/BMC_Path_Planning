@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QPainter, QColor, QBrush
 from PyQt5.QtCore import Qt, QRectF
 
-from Services.KripkeGenerator import KripkeGenerator
+from Services import KripkeGenerator
 
 
 class DesignerView(QWidget):
@@ -204,8 +204,7 @@ class DesignerView(QWidget):
               f"\nI:{self.initial_cell == self.selected_cell}")
 
     def finish_design(self):
-        kg = KripkeGenerator()
-        generate_from_system(self.designed_system, self.grid_size)
+        KripkeGenerator.generate_from_system(self.designed_system, self.grid_size)
 
     def set_robot(self):
         if not self.current_robot.is_valid():
