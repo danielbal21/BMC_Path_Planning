@@ -1,16 +1,14 @@
-import sys
 from Models.System import System
-from Models.Robot import Robot
-from Models.Robot import Movement
-
 from PyQt5 import QtGui
-from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QLineEdit, QScrollBar, QScrollArea, QCheckBox, QPushButton, QMessageBox
-)
-from PyQt5.QtGui import QPainter, QColor, QBrush
 from PyQt5.QtCore import Qt, QRectF, QPoint
+from PyQt5.QtGui import QPainter, QColor, QBrush
+from PyQt5.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout,
+    QLabel, QLineEdit, QScrollArea, QCheckBox, QPushButton, QMessageBox
+)
 
+from Models.Robot import Robot
+from Models.System import System
 from Services import KripkeGenerator
 from SystemView import SystemView
 from Utils.Visual import ArrowWidget
@@ -19,6 +17,13 @@ from Utils.Visual import ArrowWidget
 class DesignerView(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.set_robot_button = None
+        self.finish_button = None
+        self.set_initial_button = None
+        self.step_stay_checkbox = None
+        self.step_right_checkbox = None
+        self.step_left_checkbox = None
+        self.step_down_checkbox = None
         self.size = None
         self.grid_widget = None
         self.step_up_checkbox = None

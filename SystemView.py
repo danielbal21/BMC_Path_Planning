@@ -2,8 +2,9 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from PyQt5 import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QLabel, \
-    QPushButton, QHBoxLayout, QFileDialog, QWidget
+    QPushButton, QHBoxLayout, QFileDialog, QWidget, QLineEdit, QMessageBox
 
+from LoadingView import LoadingWindow
 from Services.FileManager import system_to_file
 
 
@@ -11,6 +12,8 @@ class SystemView(QWidget):
     def __init__(self, kripke, parent):
         super().__init__()
 
+        self.max_path_txt = None
+        self.timeout_txt = None
         self.text_artist = None
         self.pos = None
         self.ax = None
@@ -21,15 +24,29 @@ class SystemView(QWidget):
 
     def initUI(self):
         layout = QVBoxLayout(self)
+        iteration_timeout_line = QHBoxLayout(self)
+        iteration_max_path_length = QHBoxLayout(self)
 
         # Header Label
-        header_label = QLabel("System Viewer", self)
+        header_label = QLabel("Solver Configuration", self)
         header_label.setAlignment(Qt.Qt.AlignCenter)
         header_label.setStyleSheet("font-size: 24px; font-weight: bold; margin-bottom: 20px;")
         layout.addWidget(header_label)
 
-        sub_layout = QHBoxLayout(self)
+        # Form
+        timeout_label = QLabel("Timeout (sec): ")
+        self.timeout_txt = QLineEdit(self)
 
+        max_path_label = QLabel("Max path length: ")
+        self.max_path_txt = QLineEdit(self)
+
+        iteration_timeout_line.addWidget(timeout_label)
+        iteration_timeout_line.addWidget(self.timeout_txt)
+
+        iteration_max_path_length.addWidget(max_path_label)
+        iteration_max_path_length.addWidget(self.max_path_txt)
+
+        sub_layout = QHBoxLayout(self)
         # View Button
         view_system_btn = QPushButton("View M2", self)
         view_system_btn.setStyleSheet("""
@@ -66,10 +83,27 @@ class SystemView(QWidget):
         solve_system_btn.clicked.connect(self.solve)
         sub_layout.addWidget(solve_system_btn)
 
+        layout.addLayout(iteration_timeout_line)
+        layout.addLayout(iteration_max_path_length)
         layout.addLayout(sub_layout)
 
     def solve(self):
-        pass
+        timeout = self.timeout_txt.text()
+        max_k = self.max_path_txt.text()
+        if not timeout or not max_k:
+            QMessageBox.warning(self, "Invalid Input", "Please fill in all fields.")
+            return
+        try:
+            timeout_sec = int(timeout)
+            max_k_iterations = int(max_k)
+            if timeout_sec < 1 or max_k_iterations < 1:
+                raise ValueError()
+        except:
+            QMessageBox.warning(self, "Invalid Input", "timeout and max iterations max be a positive integer.")
+            return
+
+        LView = LoadingWindow(self.kripke.n, self.kripke, timeout_sec, max_k_iterations, self.parent)
+        self.parent.window.setCentralWidget(LView)
 
     def save_file_dialog(self):
         # Display the file dialog for saving

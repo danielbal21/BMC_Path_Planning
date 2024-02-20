@@ -1,8 +1,9 @@
 class Kripke:
-    def __init__(self):
+    def __init__(self, n):
         self.nodes = []
         self.relations = {}
         self.count = 0
+        self.n = n
         pass
 
     def __getstate__(self):

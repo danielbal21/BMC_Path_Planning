@@ -11,7 +11,7 @@ from Models.System import System
 def generate_from_system(system, n):
     node_id = 0
     robot_id = 0
-    M2 = Kripke()
+    M2 = Kripke(n)
     robot_pos = {}
     history = []
     initial_node = Node(node_id, True, False, n)
@@ -70,7 +70,7 @@ def generate_from_system(system, n):
 
 
 def create_M1(n):
-    M1 = Kripke()
+    M1 = Kripke(n)
     grid = []
 
     for i in range(n):

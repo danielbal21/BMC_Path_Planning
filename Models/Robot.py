@@ -43,22 +43,28 @@ class Robot:
 
         return valid and self.is_closed_loop()
 
-    def can_move_in_any_direction(self,movement):
+    def can_move_in_any_direction(self, movement):
         if movement is None: return False
         return movement.up == True or movement.down == True or movement.left == True or movement.right == True or movement.stay == True
 
     def is_closed_loop(self):
         valid = True
         for pos in self.movement_map:
-            if self.movement_map[pos].up and not (pos[0] - 1, pos[1]) in self.movement_map and not self.movement_map[pos].stay:
+            if self.movement_map[pos].up and not (pos[0] - 1, pos[1]) in self.movement_map and not self.movement_map[
+                pos].stay:
                 valid = False
-            elif self.movement_map[pos].down and not (pos[0] + 1, pos[1]) in self.movement_map and not self.movement_map[pos].stay:
+            elif self.movement_map[pos].down and not (pos[0] + 1, pos[1]) in self.movement_map and not \
+                    self.movement_map[pos].stay:
                 valid = False
-            elif self.movement_map[pos].right and not (pos[0], pos[1] + 1) in self.movement_map and not self.movement_map[pos].stay:
+            elif self.movement_map[pos].right and not (pos[0], pos[1] + 1) in self.movement_map and not \
+                    self.movement_map[pos].stay:
                 valid = False
-            elif self.movement_map[pos].left and not (pos[0], pos[1] - 1) in self.movement_map and not self.movement_map[pos].stay:
+            elif self.movement_map[pos].left and not (pos[0], pos[1] - 1) in self.movement_map and not \
+                    self.movement_map[pos].stay:
                 valid = False
         return valid
+
+
 class Movement:
     def __init__(self, can_go_right, can_go_left, can_go_up, can_go_down, can_stay):
         self.right = can_go_right
