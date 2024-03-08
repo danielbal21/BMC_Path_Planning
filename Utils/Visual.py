@@ -93,7 +93,10 @@ class GridDrawerWidget(QWidget):
             rect_y = p[0] * self.cell_height
             rect_width = self.cell_width
             rect_height = self.cell_height
-            painter.fillRect(rect_x, rect_y, rect_width, rect_height, QBrush(QColor(255, 0, 0)))
+            if (p[1] == self.scol) and (p[0] == self.srow):  # collision
+                painter.fillRect(rect_x, rect_y, rect_width, rect_height, QBrush(QColor(0, 0, 0)))
+            else:
+                painter.fillRect(rect_x, rect_y, rect_width, rect_height, QBrush(QColor(255, 0, 0)))
 
     def mark_rectangle_good(self, row, col):
         self.srow = row
@@ -101,4 +104,3 @@ class GridDrawerWidget(QWidget):
 
     def mark_rectangle_bad(self, points):
         self.points = points
-

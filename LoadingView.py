@@ -1,4 +1,5 @@
 import sys
+from PyQt5 import Qt
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QProgressBar, QHBoxLayout
 from PyQt5.QtCore import Qt, QTimer
 from z3 import sat, unsat
@@ -10,6 +11,8 @@ from Services.Solver import run_solver_on_thread, get_result
 class LoadingWindow(QWidget):
     def __init__(self, n, M2, timeout_sec, max_k, parent):
         super(LoadingWindow, self).__init__()
+        self.timer = None
+        self.label = None
         self.header_label = None
         self.progress_bar = None
         self.n = n
@@ -21,21 +24,22 @@ class LoadingWindow(QWidget):
         self.is_running = True
         self.current_thread = run_solver_on_thread(self.n, self.M2, self.timeout_sec, self.k)
         self.parent = parent
+        self.parent.window.setGeometry(100, 100, 400, 120)
         self.init_ui()
 
     def init_ui(self):
-        layout = QVBoxLayout()
-
+        layout = QVBoxLayout(self)
+        header_layout = QHBoxLayout(self)
         # Header
         self.header_label = QLabel("Solver", self)
-        self.header_label.setAlignment(Qt.AlignCenter)
-        self.header_label.setStyleSheet("font-size: 24px; font-weight: bold; margin-bottom: 20px;")
-        layout.addWidget(self.header_label)
+        self.header_label.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        self.header_label.setStyleSheet("font-size: 24px; font-weight: bold; margin: 0px;")
+        header_layout.addWidget(self.header_label)
+        layout.addLayout(header_layout)
 
         # Label to show updates
         self.label = QLabel("", self)
-        self.label.setAlignment(Qt.AlignCenter)
-        self.label.setStyleSheet("font-size: 16px; font-weight: bold; margin-bottom: 20px;")
+        self.label.setStyleSheet("font-size: 16px; font-weight: bold;")
         self.label.setText(f" elapsed (seconds): {self.sec_counter}, iteration {self.k}/{self.max_k}")
         centered_layout = QHBoxLayout()
         centered_layout.addStretch(1)
@@ -46,6 +50,7 @@ class LoadingWindow(QWidget):
         self.progress_bar = QProgressBar()
         self.progress_bar.setAlignment(Qt.AlignCenter)
         self.progress_bar.setRange(0, 0)  # Set to indeterminate mode
+        self.progress_bar.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.progress_bar)
         layout.addLayout(centered_layout)
         self.setLayout(layout)
@@ -62,13 +67,16 @@ class LoadingWindow(QWidget):
             if self.timeout_sec <= self.sec_counter:
                 print("Timeout in GUI")
                 self.reset()
+                RView = ResultView(self.parent, self.n, ('timeout', []), self.M2)
+                self.parent.window.setCentralWidget(RView)
 
         if not self.current_thread.is_alive() and self.is_running:
             res = get_result()
             if res[0] == sat:
+                total_time = self.sec_counter
                 self.reset()
                 print("Solved in GUI")
-                RView = ResultView(self.parent, self.n, res[1],self.M2)
+                RView = ResultView(self.parent, self.n, res, self.M2, total_time=total_time)
                 self.parent.window.setCentralWidget(RView)
             elif res[0] == unsat:
                 if self.k < self.max_k:
@@ -77,6 +85,8 @@ class LoadingWindow(QWidget):
                 else:
                     print("Not Solved in GUI")
                     self.reset()
+                    RView = ResultView(self.parent, self.n, res, self.M2)
+                    self.parent.window.setCentralWidget(RView)
 
         # Reset the progress bar for the loading animation
         if self.is_running:

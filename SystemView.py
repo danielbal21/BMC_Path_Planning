@@ -20,6 +20,7 @@ class SystemView(QWidget):
         self.fig = None
         self.parent = parent
         self.kripke = kripke
+        self.parent.window.setGeometry(100,100,400,150)
         self.initUI()
 
     def initUI(self):
@@ -30,14 +31,16 @@ class SystemView(QWidget):
         # Header Label
         header_label = QLabel("Solver Configuration", self)
         header_label.setAlignment(Qt.Qt.AlignTop | Qt.Qt.AlignHCenter)
-        header_label.setStyleSheet("font-size: 24px; font-weight: bold; margin-bottom: 5px;")
+        header_label.setStyleSheet("font-size: 24px; font-weight: bold;")
         layout.addWidget(header_label)
 
         # Form
         timeout_label = QLabel("Timeout (sec): ")
+        timeout_label.setStyleSheet("font-size: 14px; font-weight: bold; margin: 0px;")
         self.timeout_txt = QLineEdit(self)
 
         max_path_label = QLabel("Max path length: ")
+        max_path_label.setStyleSheet("font-size: 14px; font-weight: bold; margin: 0px;")
         self.max_path_txt = QLineEdit(self)
 
         iteration_timeout_line.addWidget(timeout_label)
@@ -82,6 +85,7 @@ class SystemView(QWidget):
         """)
         solve_system_btn.clicked.connect(self.solve)
         sub_layout.addWidget(solve_system_btn)
+        sub_layout.setAlignment(Qt.Qt.AlignBottom)
 
         layout.addLayout(iteration_timeout_line)
         layout.addLayout(iteration_max_path_length)
@@ -96,10 +100,11 @@ class SystemView(QWidget):
         try:
             timeout_sec = int(timeout)
             max_k_iterations = int(max_k)
-            if timeout_sec < 1 or max_k_iterations < 1:
+            if timeout_sec < 1 or max_k_iterations < 1 or max_k_iterations < ((2 * self.kripke.n) - 1):
                 raise ValueError()
         except:
-            QMessageBox.warning(self, "Invalid Input", "timeout and max iterations max be a positive integer.")
+            QMessageBox.warning(self, "Invalid Input", "timeout and max iterations max be a positive integer\nmax "
+                                                       "iterations must be at least " + str(self.kripke.n * 2 - 1))
             return
 
         LView = LoadingWindow(self.kripke.n, self.kripke, timeout_sec, max_k_iterations, self.parent)
