@@ -68,7 +68,7 @@ class LoadingWindow(QWidget):
             if res[0] == sat:
                 self.reset()
                 print("Solved in GUI")
-                RView = ResultView(self.parent, self.n, res[1])
+                RView = ResultView(self.parent, self.n, res[1],self.M2)
                 self.parent.window.setCentralWidget(RView)
             elif res[0] == unsat:
                 if self.k < self.max_k:

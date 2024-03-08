@@ -53,6 +53,7 @@ class ArrowWidget(QWidget):
 class GridDrawerWidget(QWidget):
     def __init__(self, grid_size, width, height):
         super().__init__()
+        self.points = []
         self.scol = None
         self.srow = None
         self.window_width = 0
@@ -86,7 +87,18 @@ class GridDrawerWidget(QWidget):
         rect_width = self.cell_width
         rect_height = self.cell_height
         painter.fillRect(rect_x, rect_y, rect_width, rect_height, QBrush(QColor(0, 120, 215)))
-    def mark_rectangle(self, row, col):
+
+        for p in self.points:
+            rect_x = p[1] * self.cell_width
+            rect_y = p[0] * self.cell_height
+            rect_width = self.cell_width
+            rect_height = self.cell_height
+            painter.fillRect(rect_x, rect_y, rect_width, rect_height, QBrush(QColor(255, 0, 0)))
+
+    def mark_rectangle_good(self, row, col):
         self.srow = row
         self.scol = col
+
+    def mark_rectangle_bad(self, points):
+        self.points = points
 

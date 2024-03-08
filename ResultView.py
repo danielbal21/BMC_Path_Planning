@@ -9,8 +9,9 @@ from Utils.Visual import GridDrawerWidget
 
 
 class ResultView(QWidget):
-    def __init__(self,parent, N, result):
+    def __init__(self,parent, N, result, M2):
         super().__init__()
+        self.bad_robot = None
         self.parent = parent
         self.grid_widget = None
         self.N = N
@@ -18,6 +19,7 @@ class ResultView(QWidget):
         self.timer.timeout.connect(self.update_movement)
         self.t = 0
         self.result = result
+        self.M2 = M2
         self.timer.start(1000)
         #self.parent.window.setGeometry(100,100,900,900)
         self.init_ui()
@@ -43,8 +45,23 @@ class ResultView(QWidget):
         self.setLayout(layout)
 
     def update_movement(self):
+        if self.t == 0:
+            self.bad_robot = self.M2.get_initial_state().node_id
+        else:
+            self.bad_robot = list(self.M2.relations[self.bad_robot])[0]
+            pass
+        self.grid_widget.mark_rectangle_bad(self.extract_present(self.M2.nodes[self.bad_robot].properties, self.N))
         row = self.result[self.t][0]
         column = self.result[self.t][1]
-        self.grid_widget.mark_rectangle(row,column)
+        self.grid_widget.mark_rectangle_good(row, column)
         self.grid_widget.update()
         self.t = (self.t + 1) % len(self.result)
+
+    def extract_present(self, grid, n):
+        points = []
+        for row in range(n):
+            for col in range(n):
+                if grid[row][col] is True:
+                    points.append((row, col))
+        return points
+
