@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QProgres
 from PyQt5.QtCore import Qt, QTimer
 from z3 import sat, unsat
 
+from ResultView import ResultView
 from Services.Solver import run_solver_on_thread, get_result
 
 
@@ -21,6 +22,7 @@ class LoadingWindow(QWidget):
         self.current_thread = run_solver_on_thread(self.n, self.M2, self.timeout_sec, self.k)
         self.parent = parent
         self.init_ui()
+
     def init_ui(self):
         layout = QVBoxLayout()
 
@@ -66,6 +68,8 @@ class LoadingWindow(QWidget):
             if res[0] == sat:
                 self.reset()
                 print("Solved in GUI")
+                RView = ResultView(self.parent, self.n, res[1])
+                self.parent.window.setCentralWidget(RView)
             elif res[0] == unsat:
                 if self.k < self.max_k:
                     self.k += 1

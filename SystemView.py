@@ -29,8 +29,8 @@ class SystemView(QWidget):
 
         # Header Label
         header_label = QLabel("Solver Configuration", self)
-        header_label.setAlignment(Qt.Qt.AlignCenter)
-        header_label.setStyleSheet("font-size: 24px; font-weight: bold; margin-bottom: 20px;")
+        header_label.setAlignment(Qt.Qt.AlignTop | Qt.Qt.AlignHCenter)
+        header_label.setStyleSheet("font-size: 24px; font-weight: bold; margin-bottom: 5px;")
         layout.addWidget(header_label)
 
         # Form

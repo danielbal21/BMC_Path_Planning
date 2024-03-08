@@ -14,7 +14,7 @@ class Startup(QMainWindow):
         self.prev_view = None
         self.central_widget = None
         self.setWindowTitle("Z3 Path Solver")
-        self.setFixedWidth(500)  # Set a fixed width for the main window
+        #self.setFixedWidth(500)  # Set a fixed width for the main window
         self.initUI()
 
     def initUI(self):

@@ -48,3 +48,45 @@ class ArrowWidget(QWidget):
         # Draw the circle in the center
         painter.setBrush(QColor(255, 0, 0))  # Example color (red)
         painter.drawEllipse(top_left_x, top_left_y, 2 * radius, 2 * radius)
+
+
+class GridDrawerWidget(QWidget):
+    def __init__(self, grid_size, width, height):
+        super().__init__()
+        self.scol = None
+        self.srow = None
+        self.window_width = 0
+        self.window_height = 0
+        self.cell_height = None
+        self.cell_width = None
+        self.grid_size = grid_size
+        self.selected_cell = (grid_size // 2, grid_size // 2)
+        self.width = width
+        self.height = height
+
+        # Calculate cell width and height here, where the widget size is available
+        self.cell_width = self.width // self.grid_size
+        self.cell_height = self.height // self.grid_size
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        self.draw_grid(painter)
+        if self.scol is not None and self.srow is not None:
+            self.draw_marked_rect(painter)
+
+    def draw_grid(self, painter):
+        # Draw the grid lines
+        for i in range(self.grid_size + 1):
+            painter.drawLine(0, i * self.cell_height, self.width, i * self.cell_height)
+            painter.drawLine(i * self.cell_width, 0, i * self.cell_width, self.height)
+
+    def draw_marked_rect(self, painter):
+        rect_x = self.scol * self.cell_width
+        rect_y = self.srow * self.cell_height
+        rect_width = self.cell_width
+        rect_height = self.cell_height
+        painter.fillRect(rect_x, rect_y, rect_width, rect_height, QBrush(QColor(0, 120, 215)))
+    def mark_rectangle(self, row, col):
+        self.srow = row
+        self.scol = col
+
