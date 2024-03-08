@@ -1,7 +1,9 @@
+import PyQt5
+
 from Models.System import System
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QRectF, QPoint
-from PyQt5.QtGui import QPainter, QColor, QBrush
+from PyQt5.QtGui import QPainter, QColor, QBrush, QPen
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QLineEdit, QScrollArea, QCheckBox, QPushButton, QMessageBox
@@ -271,6 +273,7 @@ class GridWidget(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
+        ar_painter = QPainter(self);
         cell_width = (self.width() * self.zoom_factor) / self.grid_size
         cell_height = (self.height() * self.zoom_factor) / self.grid_size
 
@@ -295,6 +298,7 @@ class GridWidget(QWidget):
                 else:
                     painter.drawRect(cell_rect)
 
+                painter.save()
                 if cur_movement is not None:
                     if cur_movement.right:
                         self.draw_right_arrow(painter, cell_x, cell_width, cell_y, cell_height)
@@ -305,7 +309,8 @@ class GridWidget(QWidget):
                     if cur_movement.down:
                         self.draw_down_arrow(painter, cell_x, cell_width, cell_y, cell_height)
                     if cur_movement.stay:
-                        pass
+                        self.draw_stay_arrow(painter, cell_x, cell_width, cell_y, cell_height)
+                painter.restore()
 
     def draw_right_arrow(self, painter, cell_x, cell_width, cell_y, cell_height):
         aw = ArrowWidget()
@@ -326,6 +331,10 @@ class GridWidget(QWidget):
         aw = ArrowWidget()
         aw.draw_arrow(painter, QPoint(int(cell_x + cell_width / 2), int(cell_y + (cell_height / 2))),
                       QPoint(int(cell_x + cell_width / 2), int(cell_y) + 2))
+
+    def draw_stay_arrow(self, painter, cell_x, cell_width, cell_y, cell_height):
+        aw = ArrowWidget()
+        aw.draw_circle_in_center(painter, int(cell_x + (cell_width / 2)), int(cell_y + (cell_height / 2)), 2)
 
     def mousePressEvent(self, event):
         # Get the mouse click coordinates

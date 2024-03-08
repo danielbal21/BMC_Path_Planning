@@ -2,8 +2,9 @@ import math
 
 import PyQt5
 from PyQt5.QtCore import QPoint, QPointF, QLineF
-from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QPolygonF
+from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QPolygonF, QPolygon, QPainterPath, QTransform
 from PyQt5.QtWidgets import QWidget
+from PyQt5.uic.properties import QtGui
 
 
 class ArrowWidget(QWidget):
@@ -38,3 +39,12 @@ class ArrowWidget(QWidget):
                     end_point.y() - size * math.sin(angle - math.pi / 6))
         ])
         return arrowhead_polygon
+
+    def draw_circle_in_center(self, painter, x, y, radius):
+        # Calculate the top-left corner of the bounding rectangle for the ellipse
+        top_left_x = x - radius
+        top_left_y = y - radius
+
+        # Draw the circle in the center
+        painter.setBrush(QColor(255, 0, 0))  # Example color (red)
+        painter.drawEllipse(top_left_x, top_left_y, 2 * radius, 2 * radius)
