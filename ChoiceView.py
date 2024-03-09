@@ -4,6 +4,9 @@ from PyQt5.QtCore import QCoreApplication
 
 from GeneratorView import GeneratorView
 from DesignerView import DesignerView
+from Services.FileManager import system_from_file
+from SystemView import SystemView
+
 
 class ChoiceView(QWidget):
     def __init__(self, window):
@@ -24,7 +27,6 @@ class ChoiceView(QWidget):
         layout.addWidget(button2)
         layout.addWidget(button3)
         layout.addWidget(button4)
-
 
     def createStyledButton(self, text, color, action):
         button = QPushButton(text, self)
@@ -54,11 +56,13 @@ class ChoiceView(QWidget):
 
         if file_path:
             print(f"Selected file: {file_path}")
+            M2 = system_from_file(file_path)
+            sysView = SystemView(M2, self)
+            self.window.setCentralWidget(sysView)
 
     def generateSystem(self):
         generateView = GeneratorView(self)
         self.window.setCentralWidget(generateView)
-
 
     def designSystem(self):
         designerView = DesignerView(self)

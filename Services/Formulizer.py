@@ -7,6 +7,7 @@ def create_base(n, k):
     return base
 
 
+# starting position
 def alpha_initial(base):
     return base[0][0][0]
 
@@ -15,6 +16,7 @@ def alpha_final(base, n, k):
     return base[k - 1][n - 1][n - 1]
 
 
+# valid steps
 def alpha_k(base, n, k):
     alph_k = (k >= ((2 * n) - 1))
     for t in range(k - 1):
@@ -42,10 +44,12 @@ def alpha_k(base, n, k):
 
                 # Stay
                 # total.append(base[t + 1][r][c])
-                alph_k = And(alph_k, Implies(base[t][r][c], Or(base[t + 1][r][c], PbEq([(var, 1) for var in total],1))))
+                alph_k = And(alph_k,
+                             Implies(base[t][r][c], Or(base[t + 1][r][c], PbEq([(var, 1) for var in total], 1))))
     return alph_k
 
 
+# safety
 def alpha_s(base, M2, n, k):
     current = M2.get_initial_state()
     s = True
@@ -58,24 +62,24 @@ def alpha_s(base, M2, n, k):
     return s
 
 
-def alpha_u(base, n, k):
-    pass
-
-
-def formulise(M2, n, k):
+# single path
+def alpha_sp(base, n, k):
     formula = True
-    base = create_base(n, k)
-    a_i = alpha_initial(base)
-    a_f = alpha_final(base, n, k)
-    a_k = alpha_k(base, n, k)
-    a_s = alpha_s(base, M2, n, k)
-
     for t in range(k):
         # Create a list of all variables in base[t]
         variables_in_base_t = [base[t][r][c] for r in range(n) for c in range(n)]
 
         # Perform AtMost on all variables in base[t]
-        formula = And(formula, AtMost(*variables_in_base_t, 1))
+        formula = And(AtMost(*variables_in_base_t, 1), formula)
 
-    return And(a_i, a_f, a_k, a_s, formula)
-    pass
+    return formula
+
+def formulise(M2, n, k):
+    base = create_base(n, k)
+    a_i = alpha_initial(base)
+    a_f = alpha_final(base, n, k)
+    a_k = alpha_k(base, n, k)
+    a_s = alpha_s(base, M2, n, k)
+    a_sp = alpha_sp(base, n, k)
+
+    return And(a_sp, a_i, a_f, a_k, a_s)

@@ -1,14 +1,17 @@
 class Kripke:
-    def __init__(self):
+    def __init__(self, n):
         self.nodes = []
         self.relations = {}
         self.count = 0
+        self.n = n
         pass
+
     def __getstate__(self):
         return self.__dict__
 
     def __setstate__(self, state):
         self.__dict__.update(state)
+
     def add_node(self, node):
         self.nodes.append(node)
         self.count += 1
@@ -22,6 +25,7 @@ class Kripke:
         if not (node1_id in self.relations):
             self.relations[node1_id] = set()
         self.relations[node1_id].add(node2_id)
+
     def are_related(self, node1, node2):
         return node1 in self.nodes and node1 in self.relations and node2.node_id in self.relations[node1.node_id]
 
