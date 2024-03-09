@@ -11,7 +11,7 @@ from Utils.Visual import GridDrawerWidget
 
 
 class ResultView(QWidget):
-    def __init__(self, parent, N, result, M2, total_time=0):
+    def __init__(self, parent, N, result, M2, total_time=0, time_per_iter=0):
         super().__init__()
         self.time_label = None
         self.bad_robot = None
@@ -24,6 +24,7 @@ class ResultView(QWidget):
         self.status = result[0]
         self.result = result[1]
         self.total_time = total_time
+        self.time_per_iter = time_per_iter
         self.M2 = M2
         self.parent.window.setGeometry(100, 100, 650, 550)
         self.init_ui()
@@ -48,11 +49,16 @@ class ResultView(QWidget):
             self.time_label.setStyleSheet("font-size: 18px; font-weight: bold; margin: 0px;")
             self.time_label.setContentsMargins(0, 0, 5, 0)
             # Time took
-            time_took_label = QLabel(f"Total Time: {self.total_time} seconds", self)
+            time_took_label = QLabel(f"Total Time: {self.total_time} secs | ", self)
             time_took_label.setStyleSheet("font-size: 18px; font-weight: bold; margin: 0px;")
+
+            # Time per iteration
+            time_per_iter = QLabel(f"Time per iteration: {self.time_per_iter:.2f} secs", self)
+            time_per_iter.setStyleSheet("font-size: 18px; font-weight: bold; margin: 0px;")
 
             stat_layout.addWidget(self.time_label)
             stat_layout.addWidget(time_took_label)
+            stat_layout.addWidget(time_per_iter)
             stat_layout.setAlignment(Qt.Qt.AlignTop | Qt.Qt.AlignHCenter)
 
             layout.addLayout(stat_layout)
@@ -81,7 +87,7 @@ class ResultView(QWidget):
         self.setLayout(layout)
 
     def update_movement(self):
-        self.time_label.setText(f'T={self.t + 1} / {len(self.result)}')
+        self.time_label.setText(f'T={self.t + 1}/{len(self.result)} |')
         if self.t == 0:
             self.bad_robot = self.M2.get_initial_state().node_id
         else:

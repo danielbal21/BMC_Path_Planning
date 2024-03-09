@@ -74,9 +74,11 @@ class LoadingWindow(QWidget):
             res = get_result()
             if res[0] == sat:
                 total_time = self.sec_counter
+                time_per_iter = total_time / (self.k - (2 * self.n) + 2)
                 self.reset()
                 print("Solved in GUI")
-                RView = ResultView(self.parent, self.n, res, self.M2, total_time=total_time)
+
+                RView = ResultView(self.parent, self.n, res, self.M2, total_time=total_time, time_per_iter=time_per_iter)
                 self.parent.window.setCentralWidget(RView)
             elif res[0] == unsat:
                 if self.k < self.max_k:
