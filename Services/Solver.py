@@ -7,11 +7,10 @@ from Services.Formulizer import formulise
 ret = None
 
 
-def Solve(n, M2, length, timeout_seconds):
+def Solve(n, M2, length):
     solution = []
     solver = Solver()
     solver.add(formulise(M2, n, length))
-    # solver.set("timeout", timeout_seconds * 1000)
     print(f"running with k={length}")
     try:
         # Check satisfiability with a timeout
@@ -50,7 +49,7 @@ def run_solver_on_thread(n, M2, timeout_sec, k):
 
     def target():
         global ret
-        res = Solve(n, M2, k, timeout_sec)
+        res = Solve(n, M2, k)
         ret = res
 
     thread = Thread(target=target)
