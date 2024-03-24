@@ -63,7 +63,6 @@ class LoadingWindow(QWidget):
     def update_label(self):
         if self.is_running:
             self.sec_counter += 1
-        if self.is_running and self.current_thread.is_alive():
             if self.timeout_sec <= self.sec_counter:
                 print("Timeout in GUI")
                 self.reset()
@@ -77,17 +76,19 @@ class LoadingWindow(QWidget):
                 time_per_iter = total_time / (self.k - (2 * self.n) + 2)
                 self.reset()
                 print("Solved in GUI")
-
                 RView = ResultView(self.parent, self.n, res, self.M2, total_time=total_time, time_per_iter=time_per_iter)
                 self.parent.window.setCentralWidget(RView)
+
             elif res[0] == unsat:
                 if self.k < self.max_k:
                     self.k += 1
                     self.current_thread = run_solver_on_thread(self.n, self.M2, self.timeout_sec, self.k)
                 else:
                     print("Not Solved in GUI")
+                    total_time = self.sec_counter
+                    time_per_iter = total_time / (self.k - (2 * self.n) + 2)
                     self.reset()
-                    RView = ResultView(self.parent, self.n, res, self.M2)
+                    RView = ResultView(self.parent, self.n, res, self.M2, total_time=total_time, time_per_iter=time_per_iter)
                     self.parent.window.setCentralWidget(RView)
 
         # Reset the progress bar for the loading animation

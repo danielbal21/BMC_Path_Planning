@@ -26,9 +26,11 @@ class ResultView(QWidget):
         self.total_time = total_time
         self.time_per_iter = time_per_iter
         self.M2 = M2
-        self.parent.window.setGeometry(100, 100, 650, 550)
+        if self.status == sat:
+            self.parent.window.setGeometry(100, 100, 650, 550)
+        else:
+            self.parent.window.setGeometry(100, 100, 375, 300)
         self.init_ui()
-
     def init_ui(self):
         layout = QVBoxLayout(self)
         header_layout = QHBoxLayout(self)
@@ -72,12 +74,25 @@ class ResultView(QWidget):
             self.timer.start(1000)
 
         elif self.status == unsat:
+            stats = QVBoxLayout()
             # Error Label
             msg_label = QLabel("There is no solution for this problem", self)
-            msg_label.setAlignment(Qt.Qt.AlignTop | Qt.Qt.AlignHCenter)  # Centered at the top
+            #msg_label.setAlignment(Qt.Qt.AlignTop | Qt.Qt.AlignHCenter)  # Centered at the top
             msg_label.setStyleSheet("font-size: 20px; font-weight: bold; margin: 0px;")
-            layout.addWidget(msg_label)
+            stats.addWidget(msg_label)
 
+            time_label = QLabel(f"Time Elapsed: {self.total_time}", self)
+            #time_label.setAlignment(Qt.Qt.AlignCenter | Qt.Qt.AlignHCenter)  # Centered at the top
+            time_label.setStyleSheet("font-size: 20px; font-weight: bold; margin: 0px;")
+            stats.addWidget(time_label)
+
+            timepi_label = QLabel(f"Time per Iteration: {self.time_per_iter}", self)
+            #timepi_label.setAlignment(Qt.Qt.AlignCenter | Qt.Qt.AlignHCenter)  # Centered at the top
+            timepi_label.setStyleSheet("font-size: 20px; font-weight: bold; margin: 0px;")
+            stats.addWidget(timepi_label)
+
+            stats.setAlignment(Qt.Qt.AlignCenter)
+            layout.addLayout(stats)
         elif self.status == 'timeout':
             msg_label = QLabel("Could not find a solution within the specified time", self)
             msg_label.setAlignment(Qt.Qt.AlignTop | Qt.Qt.AlignHCenter)  # Centered at the top
