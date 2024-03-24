@@ -61,9 +61,9 @@ class LoadingWindow(QWidget):
         self.timer.start(1000)  # Update every 1000 milliseconds
 
     def update_label(self):
-
-        if self.is_running and self.current_thread.is_alive():
+        if self.is_running:
             self.sec_counter += 1
+        if self.is_running and self.current_thread.is_alive():
             if self.timeout_sec <= self.sec_counter:
                 print("Timeout in GUI")
                 self.reset()
