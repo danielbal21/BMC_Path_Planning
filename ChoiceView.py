@@ -70,3 +70,4 @@ class ChoiceView(QWidget):
 
     def closeApp(self):
         self.close()
+        QCoreApplication.exit(0)
