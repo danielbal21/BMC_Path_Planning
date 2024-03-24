@@ -24,11 +24,6 @@ class GeneratorView(QWidget):
         header_label.setStyleSheet("font-size: 24px; font-weight: bold; margin-bottom: 20px;")
         layout.addWidget(header_label)
 
-        # System Name Input
-        system_name_label = QLabel("System Name:", self)
-        self.system_name_input = QLineEdit(self)
-        self.addFormRow(layout, system_name_label, self.system_name_input)
-
         # Number of Counteragents Input
         num_counteragents_label = QLabel("Number of Counteragents (>= 0):", self)
         self.num_counteragents_input = QLineEdit(self)
@@ -69,13 +64,12 @@ class GeneratorView(QWidget):
         layout.addWidget(row_widget)
 
     def generateSystem(self):
-        system_name = self.system_name_input.text()
         num_counteragents = self.num_counteragents_input.text()
         stray_radius = self.max_steps_input.text()
         grid_size = self.grid_size_input.text()
         stay_chance = self.stay_chance.text()
 
-        if not system_name or not num_counteragents or not stray_radius or not grid_size or not stay_chance:
+        if not num_counteragents or not stray_radius or not grid_size or not stay_chance:
             QMessageBox.warning(self, "Invalid Input", "Please fill in all fields.")
             return
 
