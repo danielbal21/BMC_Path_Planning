@@ -1,21 +1,33 @@
-import sys
-
 from PyQt5 import Qt
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QFileDialog, QLabel, \
-    QLineEdit, QCheckBox, QMessageBox, QHBoxLayout
-from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtWidgets import QPushButton, QVBoxLayout, QWidget, QLabel, \
+    QLineEdit, QMessageBox, QHBoxLayout
 
 from Services.KripkeGenerator import auto_generate_system
 from SystemView import SystemView
 
 
 class GeneratorView(QWidget):
+    """
+    Widget for generating systems with user-defined parameters.
+    """
     def __init__(self, parent):
+        """
+        Initialize the GeneratorView widget.
+
+        Args:
+            parent (QWidget): The parent widget.
+        """
         super().__init__(parent)
+        self.stay_chance = None
+        self.max_steps_input = None
+        self.grid_size_input = None
         self.parent = parent
         self.initUI()
 
     def initUI(self):
+        """
+        Initialize the user interface elements.
+        """
         layout = QVBoxLayout(self)
 
         # Header Label
@@ -57,6 +69,14 @@ class GeneratorView(QWidget):
         layout.addWidget(generate_button)
 
     def addFormRow(self, layout, label, widget):
+        """
+        Add a row to the form layout.
+
+        Args:
+            layout (QVBoxLayout): The layout to add the row to.
+            label (QLabel): The label for the input field.
+            widget (QWidget): The input field widget.
+        """
         row_widget = QWidget(self)
         row_layout = QHBoxLayout(row_widget)
         row_layout.addWidget(label)
@@ -64,6 +84,11 @@ class GeneratorView(QWidget):
         layout.addWidget(row_widget)
 
     def generateSystem(self):
+        """
+        Generate the system based on user input and display it.
+
+        If any input field is empty or contains invalid input, display a warning message.
+        """
         num_counteragents = self.num_counteragents_input.text()
         stray_radius = self.max_steps_input.text()
         grid_size = self.grid_size_input.text()

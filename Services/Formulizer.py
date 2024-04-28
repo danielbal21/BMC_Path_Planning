@@ -1,23 +1,61 @@
-import z3
-from z3 import Bool, Solver, solve, sat, Not, Implies, And, Or, AtMost, PbEq
+from z3 import Bool, Implies, And, Or, AtMost, PbEq
 
 
 def create_base(n, k):
+    """
+    Create a base grid of Boolean variables.
+
+    Args:
+        n (int): Size of the grid.
+        k (int): Number of time steps.
+
+    Returns:
+        list: A 3D list representing the base grid.
+    """
     base = [[[Bool(f'p_{t}_{r}_{c}') for c in range(n)] for r in range(n)] for t in range(k)]
     return base
 
 
-# starting position
 def alpha_initial(base):
+    """
+    Define the initial position.
+
+    Args:
+        base (list): The base grid.
+
+    Returns:
+        z3.BoolRef: The Boolean variable representing the initial position.
+    """
     return base[0][0][0]
 
 
 def alpha_final(base, n, k):
+    """
+    Define the final position.
+
+    Args:
+        base (list): The base grid.
+        n (int): Size of the grid.
+        k (int): Number of time steps.
+
+    Returns:
+        z3.BoolRef: The Boolean variable representing the final position.
+    """
     return base[k - 1][n - 1][n - 1]
 
 
-# valid steps
 def alpha_k(base, n, k):
+    """
+    Define valid steps.
+
+    Args:
+        base (list): The base grid.
+        n (int): Size of the grid.
+        k (int): Number of time steps.
+
+    Returns:
+        z3.BoolRef: A Boolean formula representing valid steps.
+    """
     alph_k = (k >= ((2 * n) - 1))
     for t in range(k - 1):
         for r in range(n):
@@ -49,8 +87,19 @@ def alpha_k(base, n, k):
     return alph_k
 
 
-# safety
 def alpha_s(base, M2, n, k):
+    """
+    Define safety conditions.
+
+    Args:
+        base (list): The base grid.
+        M2 (object): Object representing the system.
+        n (int): Size of the grid.
+        k (int): Number of time steps.
+
+    Returns:
+        z3.BoolRef: A Boolean formula representing safety conditions.
+    """
     current = M2.get_initial_state()
     s = True
     for t in range(k):
@@ -62,8 +111,18 @@ def alpha_s(base, M2, n, k):
     return s
 
 
-# single path
 def alpha_sp(base, n, k):
+    """
+    Define single path conditions.
+
+    Args:
+        base (list): The base grid.
+        n (int): Size of the grid.
+        k (int): Number of time steps.
+
+    Returns:
+        z3.BoolRef: A Boolean formula representing single path conditions.
+    """
     formula = True
     for t in range(k):
         # Create a list of all variables in base[t]
@@ -74,7 +133,19 @@ def alpha_sp(base, n, k):
 
     return formula
 
+
 def formulise(M2, n, k):
+    """
+    Formulate the entire system constraints.
+
+    Args:
+        M2 (object): Object representing the system.
+        n (int): Size of the grid.
+        k (int): Number of time steps.
+
+    Returns:
+        z3.BoolRef: A Boolean formula representing the entire system constraints.
+    """
     base = create_base(n, k)
     a_i = alpha_initial(base)
     a_f = alpha_final(base, n, k)

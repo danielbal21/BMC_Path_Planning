@@ -1,17 +1,28 @@
-import sys
-
 from PyQt5 import Qt
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QLabel, QHBoxLayout, \
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, \
     QScrollArea
-from PyQt5.QtGui import QColor
 from z3 import sat, unsat
 
 from Utils.Visual import GridDrawerWidget
 
 
 class ResultView(QWidget):
+    """
+    Widget for displaying the result of solving a system.
+    """
     def __init__(self, parent, N, result, M2, total_time=0, time_per_iter=0):
+        """
+        Initialize the ResultView widget.
+
+        Args:
+            parent (QWidget): The parent widget.
+            N (int): The number of counteragents in the system.
+            result: The result of solving the system.
+            M2: The system.
+            total_time (int): Total time taken for solving the system.
+            time_per_iter (int): Time taken per iteration.
+        """
         super().__init__()
         self.time_label = None
         self.bad_robot = None
@@ -31,7 +42,11 @@ class ResultView(QWidget):
         else:
             self.parent.window.setGeometry(100, 100, 375, 300)
         self.init_ui()
+
     def init_ui(self):
+        """
+        Initialize the user interface elements.
+        """
         layout = QVBoxLayout(self)
         header_layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -75,24 +90,23 @@ class ResultView(QWidget):
 
         elif self.status == unsat:
             stats = QVBoxLayout()
+
             # Error Label
             msg_label = QLabel("There is no solution for this problem", self)
-            #msg_label.setAlignment(Qt.Qt.AlignTop | Qt.Qt.AlignHCenter)  # Centered at the top
             msg_label.setStyleSheet("font-size: 20px; font-weight: bold; margin: 0px;")
             stats.addWidget(msg_label)
 
             time_label = QLabel(f"Time Elapsed: {self.total_time}", self)
-            #time_label.setAlignment(Qt.Qt.AlignCenter | Qt.Qt.AlignHCenter)  # Centered at the top
             time_label.setStyleSheet("font-size: 20px; font-weight: bold; margin: 0px;")
             stats.addWidget(time_label)
 
             timepi_label = QLabel(f"Time per Iteration: {self.time_per_iter}", self)
-            #timepi_label.setAlignment(Qt.Qt.AlignCenter | Qt.Qt.AlignHCenter)  # Centered at the top
             timepi_label.setStyleSheet("font-size: 20px; font-weight: bold; margin: 0px;")
             stats.addWidget(timepi_label)
 
             stats.setAlignment(Qt.Qt.AlignCenter)
             layout.addLayout(stats)
+
         elif self.status == 'timeout':
             msg_label = QLabel("Could not find a solution within the specified time", self)
             msg_label.setAlignment(Qt.Qt.AlignTop | Qt.Qt.AlignHCenter)  # Centered at the top
@@ -102,6 +116,9 @@ class ResultView(QWidget):
         self.setLayout(layout)
 
     def update_movement(self):
+        """
+        Update the movement in the system visualization.
+        """
         self.time_label.setText(f'T={self.t + 1}/{len(self.result)} |')
         if self.t == 0:
             self.bad_robot = self.M2.get_initial_state().node_id

@@ -1,6 +1,6 @@
 from threading import Thread
 
-from z3 import Solver, sat, is_true, unsat, solve, Z3Exception
+from z3 import Solver, sat, is_true, unsat, Z3Exception
 
 from Services.Formulizer import formulise
 
@@ -8,6 +8,17 @@ ret = None
 
 
 def Solve(n, M2, length):
+    """
+    Solve the given formula using Z3 solver.
+
+    Args:
+        n (int): Size of the grid.
+        M2 (Kripke): The Kripke structure.
+        length (int): The length of the path.
+
+    Returns:
+        tuple: A tuple containing the status of the solution and the solution itself.
+    """
     solution = []
     solver = Solver()
     solver.add(formulise(M2, n, length))
@@ -41,7 +52,18 @@ def Solve(n, M2, length):
     return status, solution
 
 
-def run_solver_on_thread(n, M2, timeout_sec, k):
+def run_solver_on_thread(n, M2, k):
+    """
+        Run the solver on a separate thread with a specified timeout.
+
+        Args:
+            n (int): Size of the grid.
+            M2 (Kripke): The Kripke structure.
+            k (int): Length of the path.
+
+        Returns:
+            Thread: The thread running the solver.
+        """
     global ret
     ret = "running", []
     if k < (2 * n) - 1:
@@ -59,11 +81,26 @@ def run_solver_on_thread(n, M2, timeout_sec, k):
 
 
 def get_result():
+    """
+    Get the result of the solver.
+
+    Returns:
+        tuple: A tuple containing the status of the solution and the solution itself.
+    """
     global ret
     return ret
 
 
 def parse_string_to_tuple(input_string):
+    """
+    Parse a string representation to a tuple.
+
+    Args:
+        input_string (str): The input string to parse.
+
+    Returns:
+        tuple: The parsed tuple.
+    """
     # Split the input string using '_' as a delimiter
     parts = input_string.split('_')
 

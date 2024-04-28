@@ -1,9 +1,6 @@
-import PyQt5
-
-from Models.System import System
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QRectF, QPoint
-from PyQt5.QtGui import QPainter, QColor, QBrush, QPen
+from PyQt5.QtGui import QPainter, QColor, QBrush
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QLineEdit, QScrollArea, QCheckBox, QPushButton, QMessageBox
@@ -17,7 +14,43 @@ from Utils.Visual import ArrowWidget
 
 
 class DesignerView(QWidget):
+    """
+    DesignerView class provides an interface for designing systems and robots.
+
+    Attributes:
+        parent: The parent widget.
+        set_robot_button: Button to add a new robot.
+        finish_button: Button to finish system design.
+        set_initial_button: Button to set the initial state of a robot.
+        step_stay_checkbox: Checkbox for robot to stay in place.
+        step_right_checkbox: Checkbox for robot to move right.
+        step_left_checkbox: Checkbox for robot to move left.
+        step_down_checkbox: Checkbox for robot to move down.
+        size: The size of the grid.
+        grid_widget: Widget to display the grid.
+        step_up_checkbox: Checkbox for robot to move up.
+        grid_size_input: Input field for grid size.
+        designed_system: The designed system.
+        current_robot: The current robot being designed.
+        design_grid: The grid for system design.
+        parent: The parent widget.
+        parent.window: The window of the parent widget.
+        grid_size: The size of the grid.
+        zoom_factor: The zoom factor for the grid.
+        center_x: The x-coordinate of the center of the grid.
+        center_y: The y-coordinate of the center of the grid.
+        panning: A boolean indicating if panning is enabled.
+        last_pos: The last position of the mouse cursor.
+        selected_cell: The currently selected cell in the grid.
+        initial_cell: The initial cell selected for the robot.
+    """
     def __init__(self, parent=None):
+        """
+        Initialize the DesignerView.
+
+        Args:
+            parent: The parent widget.
+        """
         super().__init__(parent)
         self.set_robot_button = None
         self.finish_button = None
@@ -47,6 +80,9 @@ class DesignerView(QWidget):
         self.updateControlsEnabled()
 
     def initUI(self):
+        """
+        Initialize the user interface.
+        """
         layout = QVBoxLayout(self)
 
         # Screen Header
@@ -137,7 +173,11 @@ class DesignerView(QWidget):
         self.grid_widget.onCellClicked = self.selected_cell_changed
 
     def updateControlsEnabled(self):
-        # Enable the "Set Initial" button only if a cell is selected
+        """
+        Update the enabled state of controls based on whether a cell is selected.
+
+        If a cell is selected, enable the "Set Initial" button and movement checkboxes; otherwise, disable them.
+        """
         selected = self.selected_cell is not None
         self.set_initial_button.setEnabled(selected)
         self.step_up_checkbox.setEnabled(selected)
@@ -147,8 +187,12 @@ class DesignerView(QWidget):
         self.step_stay_checkbox.setEnabled(selected)
 
     def setInitial(self):
-        # Handle the logic for setting the initial state based on checkboxes here
-        # You can access the checkbox states using self.step_up_checkbox.isChecked(), etc.
+        """
+        Set the initial state based on the selected cell and checkbox states.
+
+        If a cell is selected, update the initial cell position of the current robot based on the selected cell.
+        Otherwise, set the initial position to None. Then, update the grid color accordingly.
+        """
         self.initial_cell = self.selected_cell
         if self.initial_cell is not None:
             self.current_robot.initial_pos = (self.initial_cell[1], self.initial_cell[0])
@@ -157,6 +201,14 @@ class DesignerView(QWidget):
         self.updateGridColor()
 
     def updateGridSize(self):
+        """
+        Update the grid size based on the input provided by the user.
+
+        Try to parse the input as an integer representing the new grid size.
+        If the input is valid and greater than or equal to 2, prompt the user with a warning message.
+        If the user confirms the change, update the grid size, clear the current robot and system,
+        reset the selected cell, and update the grid widget size.
+        """
         try:
             new_size = int(self.grid_size_input.text())
             if new_size >= 2:
@@ -182,20 +234,43 @@ class DesignerView(QWidget):
             QMessageBox.warning(self, 'Invalid Value', 'The value you entered is invalid', QMessageBox.Ok)
 
     def updateGridColor(self):
+        """
+        Update the color of the grid based on the current grid size and zoom factor.
+
+        Try to update the grid color, but catch any ValueError exceptions that might occur.
+        """
         try:
             self.grid_widget.updateGridSize(self.grid_size, self.zoom_factor, colorOnly=True)
         except ValueError:
             pass
 
     def paintEvent(self, event):
+        """
+        Handle the paint event of the widget.
+
+        Fill the widget's area with a white background color.
+        """
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.fillRect(event.rect(), Qt.white)
 
     def resizeEvent(self, event):
+        """
+        Handle the resize event of the widget.
+
+        Update the grid size when the widget is resized.
+        """
         self.grid_widget.updateGridSize(self.grid_size, first=True)
 
     def movement_changed(self):
+        """
+        Update the movement of the current robot based on the checkbox states.
+
+        Add or update the movement of the selected cell in the current robot based on the state
+        of the checkboxes indicating the direction of movement. Also, update the initial cell state
+        if it matches the selected cell. Print the movement details for debugging purposes
+        and update the grid color accordingly.
+        """
         self.current_robot.add_movement(self.selected_cell[1],
                                         self.selected_cell[0],
                                         self.step_right_checkbox.isChecked(),
@@ -214,11 +289,23 @@ class DesignerView(QWidget):
         self.updateGridColor()
 
     def finish_design(self):
+        """
+        Finish designing the system and display it in the main window.
+
+        Generate the Kripke structure from the designed system and set it as the central widget
+        of the parent window.
+        """
         M2 = KripkeGenerator.generate_from_system(self.designed_system, self.grid_size)
         sysView = SystemView(M2, self.parent)
         self.parent.window.setCentralWidget(sysView)
 
     def set_robot(self):
+        """
+        Set the current robot in the designed system.
+
+        If the current robot has valid movements, add it to the designed system. Otherwise, display
+        an error message. Reset the current robot, selected cell, initial cell, and update the grid color.
+        """
         if not self.current_robot.is_valid():
             QMessageBox.critical(self, 'Invalid Robot', 'This robot has invalid movements', QMessageBox.Ok)
         else:
@@ -234,6 +321,13 @@ class DesignerView(QWidget):
             self.updateGridColor()
 
     def selected_cell_changed(self):
+        """
+        Handle the change of the selected cell.
+
+        If a cell is selected, update the checkbox states based on the movement associated with the cell.
+        If no movement exists, uncheck all checkboxes. Otherwise, check the corresponding checkboxes
+        based on the movement directions.
+        """
         if self.selected_cell is None:
             return
         movement = self.current_robot.movement_get(self.selected_cell[1], self.selected_cell[0])
@@ -262,18 +356,36 @@ class GridWidget(QWidget):
         self.initUI()
 
     def initUI(self):
+        """
+        Initialize the user interface for the grid widget.
+
+        Set the minimum size of the widget and enable mouse tracking to capture mouse wheel events.
+        """
         self.setMinimumSize(300, 300)
         self.setMouseTracking(True)  # Enable mouse tracking to capture mouse wheel events
 
     def updateGridSize(self, new_size, first=False, colorOnly=False):
+        """
+        Update the grid size and redraw the grid.
+
+        Args:
+            new_size (int): The new size of the grid.
+            first (bool): Whether it's the first update.
+            colorOnly (bool): Whether to update only the grid colors.
+        """
         if not colorOnly:
             self.grid_size = new_size
             self.adjustSize()
         self.update()
 
     def paintEvent(self, event):
+        """
+        Handle the paint event and draw the grid cells.
+
+        Args:
+            event: The paint event.
+        """
         painter = QPainter(self)
-        ar_painter = QPainter(self);
         cell_width = (self.width() * self.zoom_factor) / self.grid_size
         cell_height = (self.height() * self.zoom_factor) / self.grid_size
 
@@ -313,30 +425,89 @@ class GridWidget(QWidget):
                 painter.restore()
 
     def draw_right_arrow(self, painter, cell_x, cell_width, cell_y, cell_height):
+        """
+        Draw a right arrow in the specified cell.
+
+        Args:
+            painter: The QPainter object for drawing.
+            cell_x (float): The x-coordinate of the cell.
+            cell_width (float): The width of the cell.
+            cell_y (float): The y-coordinate of the cell.
+            cell_height (float): The height of the cell.
+        """
         aw = ArrowWidget()
         aw.draw_arrow(painter, QPoint(int(cell_x + cell_width / 2), int(cell_y + (cell_height / 2))),
                       QPoint(int(cell_x + cell_width) - 2, int(cell_y + (cell_height / 2))))
 
     def draw_left_arrow(self, painter, cell_x, cell_width, cell_y, cell_height):
+        """
+        Draw a left arrow in the specified cell.
+
+        Args:
+            painter: The QPainter object for drawing.
+            cell_x (float): The x-coordinate of the cell.
+            cell_width (float): The width of the cell.
+            cell_y (float): The y-coordinate of the cell.
+            cell_height (float): The height of the cell.
+        """
         aw = ArrowWidget()
         aw.draw_arrow(painter, QPoint(int(cell_x + cell_width / 2), int(cell_y + (cell_height / 2))),
                       QPoint(int(cell_x) + 2, int(cell_y + (cell_height / 2))))
 
     def draw_down_arrow(self, painter, cell_x, cell_width, cell_y, cell_height):
+        """
+        Draw a down arrow in the specified cell.
+
+        Args:
+            painter: The QPainter object for drawing.
+            cell_x (float): The x-coordinate of the cell.
+            cell_width (float): The width of the cell.
+            cell_y (float): The y-coordinate of the cell.
+            cell_height (float): The height of the cell.
+        """
         aw = ArrowWidget()
         aw.draw_arrow(painter, QPoint(int(cell_x + cell_width / 2), int(cell_y + (cell_height / 2))),
                       QPoint(int(cell_x + cell_width / 2), int(cell_y + cell_height) - 2))
 
     def draw_up_arrow(self, painter, cell_x, cell_width, cell_y, cell_height):
+        """
+        Draw an up arrow in the specified cell.
+
+        Args:
+            painter: The QPainter object for drawing.
+            cell_x (float): The x-coordinate of the cell.
+            cell_width (float): The width of the cell.
+            cell_y (float): The y-coordinate of the cell.
+            cell_height (float): The height of the cell.
+        """
         aw = ArrowWidget()
         aw.draw_arrow(painter, QPoint(int(cell_x + cell_width / 2), int(cell_y + (cell_height / 2))),
                       QPoint(int(cell_x + cell_width / 2), int(cell_y) + 2))
 
     def draw_stay_arrow(self, painter, cell_x, cell_width, cell_y, cell_height):
+        """
+        Draw a stay arrow (circle) in the specified cell.
+
+        Args:
+            painter: The QPainter object for drawing.
+            cell_x (float): The x-coordinate of the cell.
+            cell_width (float): The width of the cell.
+            cell_y (float): The y-coordinate of the cell.
+            cell_height (float): The height of the cell.
+        """
         aw = ArrowWidget()
         aw.draw_circle_in_center(painter, int(cell_x + (cell_width / 2)), int(cell_y + (cell_height / 2)), 2)
 
     def mousePressEvent(self, event):
+        """
+        Handle mouse press events.
+
+        Toggle the selection status of the clicked cell, update the grid, and notify the parent widget
+        about the cell click event.
+
+        Args:
+            event: The mouse press event.
+        """
         # Get the mouse click coordinates
         if event.button() == Qt.LeftButton:
             click_x = (event.x() - self.parent.center_x)
@@ -370,11 +541,26 @@ class GridWidget(QWidget):
             self.update()
 
     def mouseReleaseEvent(self, event):
+        """
+        Handle mouse release events.
+
+        Args:
+            event: The mouse release event.
+        """
         if event.button() == Qt.RightButton:
             self.parent.panning = False
             self.parent.last_pos = None
 
     def mouseMoveEvent(self, event):
+        """
+        Handle mouse move events.
+
+        If panning is enabled, update the center coordinates based on the mouse movement
+        and update the grid accordingly.
+
+        Args:
+            event: The mouse move event.
+        """
         if self.parent.panning:
             delta = event.pos() - self.parent.last_pos
             self.parent.center_x += delta.x()
@@ -383,6 +569,15 @@ class GridWidget(QWidget):
             self.update()
 
     def wheelEvent(self, event):
+        """
+        Handle mouse wheel events.
+
+        Adjust the zoom factor based on the mouse wheel movement,
+        update the grid with the new zoom factor, and center it on the mouse cursor.
+
+        Args:
+            event: The mouse wheel event.
+        """
         # Get the position of the mouse cursor
         mouse_x = event.x()
         mouse_y = event.y()
@@ -400,5 +595,3 @@ class GridWidget(QWidget):
 
         # Update the grid with the new zoom factor and center it on the mouse cursor
         self.updateGridSize(self.grid_size)
-        # self.parent.center_x = mouse_x
-        # self.parent.center_y = mouse_y

@@ -1,7 +1,7 @@
-import sys
 from PyQt5 import Qt
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QProgressBar, QHBoxLayout
+from PyQt5 import Qt
 from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QHBoxLayout
 from z3 import sat, unsat
 
 from ResultView import ResultView
@@ -9,7 +9,20 @@ from Services.Solver import run_solver_on_thread, get_result
 
 
 class LoadingWindow(QWidget):
+    """
+    Widget for displaying a loading window while solving a system.
+    """
     def __init__(self, n, M2, timeout_sec, max_k, parent):
+        """
+        Initialize the LoadingWindow widget.
+
+        Args:
+            n (int): The number of counteragents in the system.
+            M2: The system to solve.
+            timeout_sec (int): Timeout period in seconds.
+            max_k (int): Maximum number of iterations.
+            parent (QWidget): The parent widget.
+        """
         super(LoadingWindow, self).__init__()
         self.timer = None
         self.label = None
@@ -22,12 +35,15 @@ class LoadingWindow(QWidget):
         self.k = (2 * n) - 1
         self.sec_counter = 0
         self.is_running = True
-        self.current_thread = run_solver_on_thread(self.n, self.M2, self.timeout_sec, self.k)
+        self.current_thread = run_solver_on_thread(self.n, self.M2, self.k)
         self.parent = parent
         self.parent.window.setGeometry(100, 100, 400, 120)
         self.init_ui()
 
     def init_ui(self):
+        """
+        Initialize the user interface elements.
+        """
         layout = QVBoxLayout(self)
         header_layout = QHBoxLayout(self)
         # Header
@@ -61,6 +77,9 @@ class LoadingWindow(QWidget):
         self.timer.start(1000)  # Update every 1000 milliseconds
 
     def update_label(self):
+        """
+        Update the label and check for solver results periodically.
+        """
         if self.is_running:
             self.sec_counter += 1
             if self.timeout_sec <= self.sec_counter:
@@ -82,7 +101,7 @@ class LoadingWindow(QWidget):
             elif res[0] == unsat:
                 if self.k < self.max_k:
                     self.k += 1
-                    self.current_thread = run_solver_on_thread(self.n, self.M2, self.timeout_sec, self.k)
+                    self.current_thread = run_solver_on_thread(self.n, self.M2, self.k)
                 else:
                     print("Not Solved in GUI")
                     total_time = self.sec_counter
@@ -97,6 +116,9 @@ class LoadingWindow(QWidget):
             self.progress_bar.setRange(0, 0)
 
     def reset(self):
+        """
+        Reset the timer and progress bar when the loading is complete.
+        """
         self.timer.stop()
         self.progress_bar.setRange(0, 100)
         self.progress_bar.setValue(100)

@@ -9,7 +9,13 @@ from ChoiceView import ChoiceView
 
 
 class Startup(QMainWindow):
+    """
+    Main window for the application.
+    """
     def __init__(self):
+        """
+        Initialize the Startup window.
+        """
         super().__init__()
 
         self.prev_view = None
@@ -18,6 +24,9 @@ class Startup(QMainWindow):
         self.initUI()
 
     def initUI(self):
+        """
+        Initialize the user interface.
+        """
         self.setAutoFillBackground(True)
         p = self.palette()
         p.setColor(self.backgroundRole(), QColor(186, 228, 229))
@@ -28,6 +37,9 @@ class Startup(QMainWindow):
 
 # Startup
 def main():
+    """
+    Main entry point of the application.
+    """
     app = QApplication(sys.argv)
     window = Startup()
     window.show()

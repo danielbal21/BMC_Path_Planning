@@ -1,5 +1,5 @@
-from math import sqrt
 import random as rand
+
 from z3 import *
 
 from Models.Kripke import Kripke
@@ -9,8 +9,17 @@ from Models.System import System
 
 
 def generate_from_system(system, n):
+    """
+    Generate a Kripke structure from the given system.
+
+    Args:
+        system (System): The system object.
+        n (int): Size of the grid.
+
+    Returns:
+        Kripke: The generated Kripke structure.
+    """
     node_id = 0
-    robot_id = 0
     M2 = Kripke(n)
     robot_pos = {}
     history = []
@@ -70,6 +79,15 @@ def generate_from_system(system, n):
 
 
 def create_M1(n):
+    """
+    Create the M1 Kripke structure.
+
+    Args:
+        n (int): Size of the grid.
+
+    Returns:
+        Kripke: M1 Kripke structure.
+    """
     M1 = Kripke(n)
     grid = []
 
@@ -113,20 +131,42 @@ def create_M1(n):
 
 
 def auto_generate_system(n, num_counter_agents, stay_chance, stray_radius):
+    """
+    Automatically generate a system and its corresponding Kripke structure.
+
+    Args:
+        n (int): Size of the grid.
+        num_counter_agents (int): Number of counter agents.
+        stay_chance (float): Probability of staying in the same position.
+        stray_radius (int): Maximum radius for straying from the initial position.
+
+    Returns:
+        Tuple[System, Kripke]: A tuple containing the generated system and its corresponding Kripke structure.
+    """
     generated_system = System()
 
     for rnum in range(num_counter_agents):
         generated_system.add_robot(auto_gen_robot(n, stay_chance, stray_radius))
 
-    return generated_system, generate_from_system(generated_system,n)
+    return generated_system, generate_from_system(generated_system, n)
 
 
 def auto_gen_robot(n, stay_chance, stray_radius):
+    """
+    Automatically generate a robot with random movements.
+
+    Args:
+        n (int): Size of the grid.
+        stay_chance (float): Probability of staying in the same position.
+        stray_radius (int): Maximum radius for straying from the initial position.
+
+    Returns:
+        Robot: The generated robot.
+    """
     robot = Robot()
     initial_pos = (random_number(0, n - 1), random_number(0, n - 1))
     print(f"initial: {initial_pos}")
     can_initially_stay = has_happend(stay_chance)
-    minimal_stray_radius = 0
     if can_initially_stay:
         minimal_stray_radius = 0
     else:
@@ -141,7 +181,6 @@ def auto_gen_robot(n, stay_chance, stray_radius):
     robot.add_movement(initial_pos[0], initial_pos[1], can_move_right, can_move_left, can_move_up, can_move_down,
                        can_initially_stay, True)
     current_pos = initial_pos
-    cur_distance = (travel_distance, travel_distance)
 
     if (not can_move_up) and (not can_move_down) and (not can_move_left) and (not can_move_right):
         can_initially_stay = True
@@ -167,20 +206,65 @@ def auto_gen_robot(n, stay_chance, stray_radius):
 
     return robot
 
+
 def has_happend(chance):
+    """
+    Determine if an event has occurred based on a given probability.
+
+    Args:
+        chance (float): The probability of the event occurring.
+
+    Returns:
+        bool: True if the event has occurred, False otherwise.
+    """
     return rand.random() < chance
 
 
-def random_number(min, max):
-    return rand.randint(min, max)
+def random_number(min_num, max_num):
+    """
+    Generate a random integer within the specified range.
+
+    Args:
+        min (int): The minimum value of the range.
+        max (int): The maximum value of the range.
+
+    Returns:
+        int: A random integer within the specified range.
+    """
+    return rand.randint(min_num, max_num)
 
 
 def distance(r, c, ri, ci):
+    """
+    Calculate the distance between two points.
+
+    Args:
+        r (int): Row of the first point.
+        c (int): Column of the first point.
+        ri (int): Row of the second point.
+        ci (int): Column of the second point.
+
+    Returns:
+        tuple: A tuple representing the distance between the two points along the rows and columns.
+    """
     return (ri - r), (ci - c)
 
 
 def step(current_pos, n, robot, initial_pos, stay_chance, travel_distance):
-    print(current_pos)
+    """
+    Take a step in the robot's movement and update its properties accordingly.
+
+    Args:
+        current_pos (tuple): The current position of the robot.
+        n (int): Size of the grid.
+        robot (Robot): The robot object.
+        initial_pos (tuple): The initial position of the robot.
+        stay_chance (float): Probability of staying in the same position.
+        travel_distance (int): Maximum distance the robot can travel from its initial position.
+
+    Returns:
+        None
+    """
     if robot.movement_get(current_pos[0], current_pos[1]) is not None:
         return
 

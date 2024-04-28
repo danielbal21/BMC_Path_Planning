@@ -9,7 +9,17 @@ from Services.FileManager import system_to_file
 
 
 class SystemView(QWidget):
+    """
+    Widget for configuring and visualizing a system.
+    """
     def __init__(self, kripke, parent):
+        """
+        Initialize the SystemView widget.
+
+        Args:
+            kripke: The Kripke structure representing the system.
+            parent: The parent widget.
+        """
         super().__init__()
 
         self.max_path_txt = None
@@ -24,6 +34,9 @@ class SystemView(QWidget):
         self.initUI()
 
     def initUI(self):
+        """
+        Initialize the user interface elements.
+        """
         layout = QVBoxLayout(self)
         iteration_timeout_line = QHBoxLayout(self)
         iteration_max_path_length = QHBoxLayout(self)
@@ -92,6 +105,9 @@ class SystemView(QWidget):
         layout.addLayout(sub_layout)
 
     def solve(self):
+        """
+        Handle the Solve button click event.
+        """
         timeout = self.timeout_txt.text()
         max_k = self.max_path_txt.text()
         if not timeout or not max_k:
@@ -111,6 +127,9 @@ class SystemView(QWidget):
         self.parent.window.setCentralWidget(LView)
 
     def save_file_dialog(self):
+        """
+        Display the file dialog for saving the system.
+        """
         # Display the file dialog for saving
         file_dialog = QFileDialog()
         file_dialog.setAcceptMode(QFileDialog.AcceptSave)
@@ -122,7 +141,9 @@ class SystemView(QWidget):
             system_to_file(file_path, self.kripke)
 
     def kripke_present(self):
-
+        """
+        Display the Kripke structure visualization.
+        """
         plt.close()
         self.fig, self.ax = plt.subplots()
         self.fig.suptitle('Kripke Viewer')
@@ -143,6 +164,9 @@ class SystemView(QWidget):
         plt.show()
 
     def wheelEvent(self, event):
+        """
+        Handle zooming using the mouse wheel.
+        """
         # Zoom in/out using the mouse wheel
         factor = 1.2
         if event.angleDelta().y() < 0:
@@ -150,6 +174,15 @@ class SystemView(QWidget):
         self.scale(factor, factor)
 
     def generate_2d_array_string(self, matrix):
+        """
+        Generate a string representation of a 2D matrix.
+
+        Args:
+            matrix: The input matrix.
+
+        Returns:
+            str: A string representation of the matrix.
+        """
         result = ""
         for row_index, row in enumerate(matrix):
             for col_index, value in enumerate(row):
@@ -158,6 +191,12 @@ class SystemView(QWidget):
         return result
 
     def on_click(self, event):
+        """
+        Handle the click event on the visualization.
+
+        Args:
+            event: The event object.
+        """
         tol = 0.1
         if event.inaxes == self.ax:
             for node in self.pos:
@@ -167,6 +206,12 @@ class SystemView(QWidget):
                     break
 
     def show_message(self, node_id):
+        """
+        Display additional information on node click.
+
+        Args:
+            node_id: The ID of the clicked node.
+        """
         matrix_string = f"Safety Matrix for {node_id}:\n"
         matrix_string += self.generate_2d_array_string(self.kripke.nodes[node_id].properties)
 
