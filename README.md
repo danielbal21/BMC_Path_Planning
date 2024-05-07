@@ -46,9 +46,24 @@ The objective is to find a path on a given grid, encompassing N by N dimensions,
 
 ## Installation
 
+Clone the repository
+```
+git clone https://github.com/danielbal21/BMC_Path_Planning.git
+```
+
+In the terminal go to the repository's local path
+```
+cd BMC_Path_Planning
+```
+
 To install the project dependencies, run:
 ```
 pip install -r requirements.txt
+```
+
+Run the application GUI
+```
+python Window.py
 ```
 
 ## Code Usage Example
