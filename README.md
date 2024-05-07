@@ -49,9 +49,6 @@ To install the project dependencies, run:
 ```
 pip install -r requirements.txt
 ```
-## Usage
-
-Consult the User Manual supplied in the Project Book: Capstone Project Phase B-23-2-R5.docx - User Manual Section
 
 ## Code Usage Example
 The following codes demonstrates a basic benchmark recorder using the Models and Services provided in this project.
