@@ -1,6 +1,7 @@
 # Path Planning via BMC and Hyper-Properties
 
 ## Overview
+![](https://github.com/danielbal21/BMC_Path_Planning/blob/main/example_maze.gif)
 
 The objective is to find a path on a given grid, encompassing N by N dimensions, with a central agent and multiple dynamic counteragents. The task is to ascertain a viable path for the main agent that adheres to step-by-step validity and avoids collisions with counteragents. This is achieved by transforming the grid into Kripke Structures, subsequently translated into Boolean formulas, and presented to SAT solvers. A solution to these formulas equates to a valid path for the main agent, therefore reducing the pathfinding challenge into a SAT problem. The formulas, acting as the model, undergo iterative evaluation up to a specified bound (BMC), representative of the main agent's path length.
 
