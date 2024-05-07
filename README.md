@@ -12,6 +12,13 @@ The objective is to find a path on a given grid, encompassing N by N dimensions,
 - Solve with timeout and bound constraints
 - Iterative animation of the path found
 
+## Documentation: Guides and Tutorial
+- User Manual
+- Maintenance Guide
+- Demonstration Video
+- Project Presentation
+- Project Research Book
+  
 ## Project Hierarchy
 
 ### Analyzer Folder
